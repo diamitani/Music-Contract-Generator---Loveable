@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { useContract } from '@/context/ContractContext';
-import { CONTRACT_FIELDS, generateContract, CONTRACT_TYPES } from '@/utils/contractTemplates';
+import { CONTRACT_FIELDS, generateContract, CONTRACT_TYPES } from '@/utils/contracts';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 

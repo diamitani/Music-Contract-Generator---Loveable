@@ -1,6 +1,7 @@
+
 import { useState } from 'react';
 import { useContract } from '@/context/ContractContext';
-import { CONTRACT_TYPES } from '@/utils/contractTemplates';
+import { CONTRACT_TYPES } from '@/utils/contracts';
 import { UserRoundCog, Disc, PenTool, Mic2, FileSpreadsheet, Share2, Music } from 'lucide-react';
 
 const ContractTypeSelector = () => {
