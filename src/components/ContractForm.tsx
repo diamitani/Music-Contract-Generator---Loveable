@@ -1,9 +1,11 @@
-
 import { useEffect, useState } from 'react';
 import { useContract } from '@/context/ContractContext';
-import { CONTRACT_FIELDS, generateContract } from '@/utils/contractTemplates';
+import { CONTRACT_FIELDS, generateContract, CONTRACT_TYPES } from '@/utils/contractTemplates';
 import { ArrowLeft, ArrowRight, Download, Pen, Send } from 'lucide-react';
 import { toast } from 'sonner';
+import ContractTypeSelector from './ContractTypeSelector';
+
+type ContractType = 'artist-manager' | 'record-label' | 'producer' | 'songwriter' | 'performance' | 'licensing' | 'distribution';
 
 const ContractForm = () => {
   const { 
@@ -38,7 +40,6 @@ const ContractForm = () => {
   const handleSubmit = () => {
     setIsSubmitting(true);
     
-    // Validate required fields
     const requiredFields = Object.entries(contractFields.fields)
       .filter(([_, field]: [string, any]) => field.required)
       .map(([key]) => key);
@@ -51,7 +52,6 @@ const ContractForm = () => {
       return;
     }
     
-    // Generate contract
     try {
       updateContractDetails(formData);
       const contract = generateContract(contractDetails.type as string, formData);
@@ -73,54 +73,46 @@ const ContractForm = () => {
     
     setIsAiRequesting(true);
     
-    // Simulate AI analyzing the input
     setTimeout(() => {
-      // This is a simplified example - in a real app, this would be an API call
-      let contractType;
+      let contractType: ContractType;
       let extractedDetails: {[key: string]: any} = {};
       
-      // Simple keyword matching for demo purposes
       const input = aiInput.toLowerCase();
       
       if (input.includes('manager') || input.includes('agent')) {
-        contractType = 'artist-manager';
+        contractType = 'artist-manager' as ContractType;
         
-        // Extract percentage if mentioned
         const percentageMatch = input.match(/(\d+)%/);
         if (percentageMatch) {
           extractedDetails.percentage = parseInt(percentageMatch[1]);
         }
         
-        // Extract names if formatted as "between X and Y"
         const nameMatch = input.match(/between\s+([a-z\s]+)\s+and\s+([a-z\s]+)/i);
         if (nameMatch) {
           extractedDetails.artist = nameMatch[1].trim();
           extractedDetails.manager = nameMatch[2].trim();
         }
       } else if (input.includes('label') || input.includes('record')) {
-        contractType = 'record-label';
+        contractType = 'record-label' as ContractType;
       } else if (input.includes('producer')) {
-        contractType = 'producer';
+        contractType = 'producer' as ContractType;
       } else if (input.includes('songwriter') || input.includes('writing')) {
-        contractType = 'songwriter';
+        contractType = 'songwriter' as ContractType;
       } else if (input.includes('perform') || input.includes('gig') || input.includes('show')) {
-        contractType = 'performance';
+        contractType = 'performance' as ContractType;
       } else if (input.includes('licens')) {
-        contractType = 'licensing';
+        contractType = 'licensing' as ContractType;
       } else if (input.includes('distribut')) {
-        contractType = 'distribution';
+        contractType = 'distribution' as ContractType;
       } else {
-        // Default to manager agreement if unclear
-        contractType = 'artist-manager';
+        contractType = 'artist-manager' as ContractType;
       }
       
-      // Set the inferred contract type
       updateContractDetails({
         type: contractType,
         ...extractedDetails
       });
       
-      // Move to the appropriate step
       setContractType(contractType);
       
       toast.success('AI analysis complete! Please fill in the remaining details.');
@@ -132,12 +124,11 @@ const ContractForm = () => {
     setCurrentStep(0);
   };
   
-  const setContractType = (type: string) => {
+  const setContractType = (type: ContractType) => {
     updateContractDetails({ type });
     setCurrentStep(1);
   };
   
-  // Determine missing fields for AI prompt
   const getMissingFields = () => {
     if (!contractDetails.type) return [];
     
@@ -224,7 +215,7 @@ const ContractForm = () => {
   }
   
   if (currentStep === 0.5) {
-    return <ContractTypes />;
+    return <ContractTypeSelector />;
   }
   
   if (currentStep === 1) {
@@ -337,7 +328,6 @@ const ContractForm = () => {
     );
   }
   
-  // Contract preview (step 2)
   return (
     <div className="w-full max-w-4xl mx-auto">
       <button
@@ -359,7 +349,6 @@ const ContractForm = () => {
           <button 
             className="button-transition flex items-center gap-2 border border-gray-300 dark:border-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-900"
             onClick={() => {
-              // This would typically open an editor or enable editing mode
               toast.info('Editing mode enabled. Make your changes in the text below.');
             }}
           >
@@ -369,7 +358,6 @@ const ContractForm = () => {
           <button 
             className="button-transition flex items-center gap-2 bg-black text-white dark:bg-white dark:text-black px-4 py-2 rounded-full text-sm font-medium hover:bg-opacity-80 dark:hover:bg-opacity-80"
             onClick={() => {
-              // In a real app, this would generate and download the document
               const blob = new Blob([contractText], { type: 'text/plain' });
               const url = URL.createObjectURL(blob);
               const a = document.createElement('a');
