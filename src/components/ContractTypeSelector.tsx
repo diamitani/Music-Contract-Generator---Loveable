@@ -1,9 +1,7 @@
-
 import { useState } from 'react';
 import { useContract } from '@/context/ContractContext';
 import { CONTRACT_TYPES } from '@/utils/contractTemplates';
-import { UserRoundCog, Disc, PenTool, Mic2, FileSpreadsheet, Share2 } from 'lucide-react';
-import { Music } from 'lucide-react';
+import { UserRoundCog, Disc, PenTool, Mic2, FileSpreadsheet, Share2, Music } from 'lucide-react';
 
 const ContractTypeSelector = () => {
   const { setContractType, setCurrentStep } = useContract();
@@ -18,12 +16,12 @@ const ContractTypeSelector = () => {
     switch (iconName) {
       case 'UserRoundCog': return <UserRoundCog className="w-6 h-6" />;
       case 'Disc': return <Disc className="w-6 h-6" />;
-      case 'MusicNote': return <Music className="w-6 h-6" />; // Changed to Music from MusicNote
+      case 'MusicNote': return <Music className="w-6 h-6" />;
       case 'PenTool': return <PenTool className="w-6 h-6" />;
       case 'Mic2': return <Mic2 className="w-6 h-6" />;
       case 'FileSpreadsheet': return <FileSpreadsheet className="w-6 h-6" />;
       case 'Share2': return <Share2 className="w-6 h-6" />;
-      default: return <Music className="w-6 h-6" />; // Changed to Music from MusicNote
+      default: return <Music className="w-6 h-6" />;
     }
   };
 
