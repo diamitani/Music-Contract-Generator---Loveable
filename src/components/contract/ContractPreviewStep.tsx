@@ -1,12 +1,61 @@
 
 import { useState } from 'react';
 import { useContract } from '@/context/ContractContext';
-import { ArrowLeft, Download, Pen } from 'lucide-react';
+import { ArrowLeft, Download, Pen, FileType } from 'lucide-react';
 import { toast } from 'sonner';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 
 const ContractPreviewStep = () => {
   const { setCurrentStep, generatedContract } = useContract();
   const [contractText, setContractText] = useState(generatedContract || '');
+
+  const handleDownload = (format: 'txt' | 'docx') => {
+    // For txt format, use blob
+    if (format === 'txt') {
+      const blob = new Blob([contractText], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `contract.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      toast.success('Contract downloaded as text file successfully!');
+    } 
+    // For Word document format
+    else if (format === 'docx') {
+      // Creating a Word-compatible document using HTML
+      const htmlContent = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' 
+              xmlns:w='urn:schemas-microsoft-com:office:word' 
+              xmlns='http://www.w3.org/TR/REC-html40'>
+          <head>
+            <meta charset="utf-8">
+            <title>Contract</title>
+          </head>
+          <body>
+            <div style="white-space: pre-wrap; font-family: 'Times New Roman', Times, serif;">
+              ${contractText.replace(/\n/g, '<br>')}
+            </div>
+          </body>
+        </html>
+      `;
+      
+      const blob = new Blob([htmlContent], { type: 'application/msword' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `contract.doc`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      toast.success('Contract downloaded as Word document successfully!');
+    }
+  };
 
   return (
     <div className="w-full max-w-4xl mx-auto">
@@ -35,24 +84,33 @@ const ContractPreviewStep = () => {
             <Pen className="w-4 h-4" /> Edit
           </button>
           
-          <button 
-            className="button-transition flex items-center gap-2 bg-black text-white dark:bg-white dark:text-black px-4 py-2 rounded-full text-sm font-medium hover:bg-opacity-80 dark:hover:bg-opacity-80"
-            onClick={() => {
-              const blob = new Blob([contractText], { type: 'text/plain' });
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement('a');
-              a.href = url;
-              a.download = `contract.txt`;
-              document.body.appendChild(a);
-              a.click();
-              document.body.removeChild(a);
-              URL.revokeObjectURL(url);
-              
-              toast.success('Contract downloaded successfully!');
-            }}
-          >
-            <Download className="w-4 h-4" /> Download
-          </button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <button 
+                className="button-transition flex items-center gap-2 bg-black text-white dark:bg-white dark:text-black px-4 py-2 rounded-full text-sm font-medium hover:bg-opacity-80 dark:hover:bg-opacity-80"
+              >
+                <Download className="w-4 h-4" /> Download
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-48">
+              <div className="flex flex-col space-y-1">
+                <button
+                  className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md text-sm"
+                  onClick={() => handleDownload('txt')}
+                >
+                  <FileType className="w-4 h-4" />
+                  <span>Text File (.txt)</span>
+                </button>
+                <button
+                  className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md text-sm"
+                  onClick={() => handleDownload('docx')}
+                >
+                  <FileType className="w-4 h-4" />
+                  <span>Word Document (.doc)</span>
+                </button>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
       
