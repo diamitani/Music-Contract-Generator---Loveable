@@ -2,13 +2,43 @@
 import { useState } from 'react';
 import { useContract } from '@/context/ContractContext';
 import { CONTRACT_TYPES } from '@/utils/contracts';
-import { UserRoundCog, Disc, PenTool, Mic2, FileSpreadsheet, Share2, Music } from 'lucide-react';
+import { UserRoundCog, Disc, PenTool, Mic2, FileSpreadsheet, Share2, Music, Globe, Zap, Award } from 'lucide-react';
 import ContractTypeFAQ from './contract/ContractTypeFAQ';
+
+// Enhanced list with more modern contract types for independent artists
+const ENHANCED_CONTRACT_TYPES = [
+  ...CONTRACT_TYPES,
+  {
+    id: 'collaboration',
+    name: 'Collaboration Agreement',
+    description: 'Contract between artists working together on a project, detailing contributions and revenue sharing.',
+    icon: 'Zap',
+  },
+  {
+    id: 'session-musician',
+    name: 'Session Musician Agreement',
+    description: 'Contract for hiring session musicians, covering payment, rights, and usage terms.',
+    icon: 'Music',
+  },
+  {
+    id: 'sync-licensing',
+    name: 'Sync Licensing Agreement',
+    description: 'Contract for synchronization licensing of music in film, TV, advertisements, or other media.',
+    icon: 'Globe',
+  },
+  {
+    id: 'nft-music',
+    name: 'NFT Music Release Agreement',
+    description: 'Modern contract for releasing music as NFTs, covering royalties and digital ownership rights.',
+    icon: 'Award',
+  },
+];
 
 const ContractTypeSelector = () => {
   const { setContractType, setCurrentStep } = useContract();
   const [hoveredType, setHoveredType] = useState<string | null>(null);
   const [selectedForFAQ, setSelectedForFAQ] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const handleSelectType = (typeId: any) => {
     setContractType(typeId);
@@ -24,9 +54,17 @@ const ContractTypeSelector = () => {
       case 'Mic2': return <Mic2 className="w-6 h-6" />;
       case 'FileSpreadsheet': return <FileSpreadsheet className="w-6 h-6" />;
       case 'Share2': return <Share2 className="w-6 h-6" />;
+      case 'Zap': return <Zap className="w-6 h-6" />;
+      case 'Globe': return <Globe className="w-6 h-6" />;
+      case 'Award': return <Award className="w-6 h-6" />;
       default: return <Music className="w-6 h-6" />;
     }
   };
+
+  const filteredContractTypes = ENHANCED_CONTRACT_TYPES.filter(type => 
+    type.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    type.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="w-full max-w-4xl mx-auto">
@@ -37,8 +75,18 @@ const ContractTypeSelector = () => {
         Choose the type of music agreement that best fits your needs
       </p>
       
+      <div className="mb-6">
+        <input
+          type="text"
+          placeholder="Search contract types..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/50"
+        />
+      </div>
+      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-slide-in-up animation-delay-200">
-        {CONTRACT_TYPES.map((type, index) => (
+        {filteredContractTypes.map((type, index) => (
           <div key={type.id} className="flex flex-col">
             <button
               onClick={() => handleSelectType(type.id)}

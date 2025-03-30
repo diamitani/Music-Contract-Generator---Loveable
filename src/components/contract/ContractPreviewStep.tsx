@@ -4,12 +4,13 @@ import { useContract } from '@/context/ContractContext';
 import { ArrowLeft, Download, Pen, FileType } from 'lucide-react';
 import { toast } from 'sonner';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { exportToPDF } from '@/utils/pdfExport';
 
 const ContractPreviewStep = () => {
   const { setCurrentStep, generatedContract } = useContract();
   const [contractText, setContractText] = useState(generatedContract || '');
 
-  const handleDownload = (format: 'txt' | 'docx') => {
+  const handleDownload = (format: 'txt' | 'docx' | 'pdf') => {
     // For txt format, use blob
     if (format === 'txt') {
       const blob = new Blob([contractText], { type: 'text/plain' });
@@ -54,6 +55,15 @@ const ContractPreviewStep = () => {
       URL.revokeObjectURL(url);
       
       toast.success('Contract downloaded as Word document successfully!');
+    }
+    // For PDF format
+    else if (format === 'pdf') {
+      try {
+        exportToPDF(contractText, 'contract.pdf');
+        toast.success('Contract downloaded as PDF successfully!');
+      } catch (error) {
+        toast.error('Failed to download PDF. Please try again.');
+      }
     }
   };
 
@@ -107,6 +117,13 @@ const ContractPreviewStep = () => {
                 >
                   <FileType className="w-4 h-4" />
                   <span>Word Document (.doc)</span>
+                </button>
+                <button
+                  className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md text-sm"
+                  onClick={() => handleDownload('pdf')}
+                >
+                  <FileType className="w-4 h-4" />
+                  <span>PDF Document (.pdf)</span>
                 </button>
               </div>
             </PopoverContent>

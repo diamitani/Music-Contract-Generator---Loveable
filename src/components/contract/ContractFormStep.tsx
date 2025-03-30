@@ -4,13 +4,18 @@ import { useContract } from '@/context/ContractContext';
 import { CONTRACT_FIELDS, generateContract, CONTRACT_TYPES } from '@/utils/contracts';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
+import OpenAIService from '@/utils/openai';
+import ApiKeyInput from './ApiKeyInput';
 
 const ContractFormStep = () => {
   const { 
     contractDetails, 
     updateContractDetails, 
     setGeneratedContract,
-    setCurrentStep
+    setCurrentStep,
+    apiKey,
+    useAI,
+    toggleUseAI
   } = useContract();
   
   const [formData, setFormData] = useState<{ [key: string]: any }>({});
@@ -31,7 +36,7 @@ const ContractFormStep = () => {
     }));
   };
   
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setIsSubmitting(true);
     
     const requiredFields = Object.entries(contractFields.fields)
@@ -48,12 +53,35 @@ const ContractFormStep = () => {
     
     try {
       updateContractDetails(formData);
-      const contract = generateContract(contractDetails.type as string, formData);
+      
+      let contract;
+      
+      // Use AI if enabled and API key is provided
+      if (useAI && apiKey) {
+        try {
+          const openai = new OpenAIService({ apiKey });
+          const contractTypeName = CONTRACT_TYPES.find(t => t.id === contractDetails.type)?.name || contractDetails.type;
+          
+          const prompt = Object.entries(formData)
+            .map(([key, value]) => `${contractFields.fields[key]?.label || key}: ${value}`)
+            .join(', ');
+          
+          const aiGeneratedContract = await openai.generateContract(prompt, contractTypeName as string);
+          contract = aiGeneratedContract;
+        } catch (error: any) {
+          console.error("AI Generation Error:", error);
+          toast.error(`AI generation failed: ${error.message}. Using template instead.`);
+          contract = generateContract(contractDetails.type as string, formData);
+        }
+      } else {
+        contract = generateContract(contractDetails.type as string, formData);
+      }
+      
       setGeneratedContract(contract);
       setCurrentStep(2);
-      setIsSubmitting(false);
     } catch (error) {
       toast.error('Error generating contract. Please try again.');
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -84,6 +112,19 @@ const ContractFormStep = () => {
         <h3 className="text-lg font-medium mb-4">
           Great! You're drafting a <span className="font-bold">{contractTypeName}</span>
         </h3>
+        
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-2">
+            <span className="text-sm font-medium">AI-powered generation:</span>
+            <button 
+              onClick={toggleUseAI}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${useAI ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'}`}
+            >
+              <span className={`${useAI ? 'translate-x-6' : 'translate-x-1'} inline-block h-4 w-4 transform rounded-full bg-white transition-transform`} />
+            </button>
+          </div>
+          <ApiKeyInput />
+        </div>
         
         {missingFields.length > 0 && (
           <div className="mb-4">
