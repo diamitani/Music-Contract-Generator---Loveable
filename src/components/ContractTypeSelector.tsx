@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useContract } from '@/context/ContractContext';
 import { CONTRACT_TYPES } from '@/utils/contracts';
@@ -6,7 +5,6 @@ import { ContractType } from '@/utils/contracts/types';
 import { UserRoundCog, Disc, PenTool, Mic2, FileSpreadsheet, Share2, Music, Globe, Zap, Award } from 'lucide-react';
 import ContractTypeFAQ from './contract/ContractTypeFAQ';
 
-// Enhanced list with more modern contract types for independent artists
 const ENHANCED_CONTRACT_TYPES = [
   ...CONTRACT_TYPES,
   {
@@ -124,7 +122,7 @@ const ContractTypeSelector = () => {
             </button>
             
             {selectedForFAQ === type.id && (
-              <ContractTypeFAQ contractType={type.id} />
+              <ContractTypeFAQ contractType={type.id as ContractType} />
             )}
           </div>
         ))}
