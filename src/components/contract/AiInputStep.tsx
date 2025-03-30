@@ -5,13 +5,13 @@ import { Button } from '@/components/ui/button';
 import { LightbulbIcon, ArrowRight, Upload } from 'lucide-react';
 
 const AiInputStep = () => {
-  const { hasApiKey, useAI, toggleUseAI, setCurrentStep } = useContract();
+  const { hasApiKey, useAI, toggleUseAI, setCurrentStep, useDefaultApiKey } = useContract();
 
   return (
     <div className="w-full max-w-4xl mx-auto py-8">
       <h2 className="text-2xl md:text-3xl font-bold mb-6">Music Contract Generator</h2>
 
-      {!hasApiKey && useAI && (
+      {!hasApiKey && useAI && !useDefaultApiKey && (
         <div className="glass-panel p-6 mb-8 animate-slide-in-up">
           <h3 className="text-xl font-semibold mb-4">Enter your OpenAI API Key</h3>
           <ApiKeyInput />
@@ -42,9 +42,16 @@ const AiInputStep = () => {
           <div>
             <p className="text-sm text-blue-800 dark:text-blue-200">
               {useAI 
-                ? "Our AI will generate a professional contract based on your inputs. An OpenAI API key is required for this feature." 
+                ? useDefaultApiKey 
+                  ? "Our AI will generate a professional contract using our API key. You don't need to provide your own." 
+                  : "Our AI will generate a professional contract based on your inputs. An OpenAI API key is required for this feature."
                 : "AI generation is currently disabled. You'll be able to create a contract by filling out a form manually."}
             </p>
+            {useAI && (
+              <div className="mt-2">
+                <ApiKeyInput />
+              </div>
+            )}
           </div>
         </div>
 

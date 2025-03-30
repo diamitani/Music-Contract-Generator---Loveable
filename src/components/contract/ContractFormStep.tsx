@@ -15,7 +15,8 @@ const ContractFormStep = () => {
     setCurrentStep,
     apiKey,
     useAI,
-    toggleUseAI
+    toggleUseAI,
+    useDefaultApiKey
   } = useContract();
   
   const [formData, setFormData] = useState<{ [key: string]: any }>({});
@@ -56,7 +57,7 @@ const ContractFormStep = () => {
       
       let contract;
       
-      // Use AI if enabled and API key is provided
+      // Use AI if enabled and API key is available (either default or user's)
       if (useAI && apiKey) {
         try {
           const openai = new OpenAIService({ apiKey });

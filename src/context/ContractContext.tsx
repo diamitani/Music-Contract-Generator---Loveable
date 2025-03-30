@@ -33,7 +33,12 @@ interface ContractContextType {
   setAnalyzedTerms: (terms: Array<{ term: string; explanation: string }> | null) => void;
   isAnalyzing: boolean;
   setIsAnalyzing: (analyzing: boolean) => void;
+  useDefaultApiKey: boolean;
+  toggleUseDefaultApiKey: () => void;
 }
+
+// Default API key provided by the site owner
+const DEFAULT_API_KEY = "sk-svcacct-zL_TFd0L60HxVz6aGemkIf9b53Tgjaiyy6msVd3N-Ia_xBmEc9guLxdcYCMT3BlbkFJoG4SeRAEhx0SfhCATepQFh40CxmeqpXdHtljnWHQfNvWGhYQoIYUP11vM5wA";
 
 const defaultContractDetails: ContractDetails = {
   type: null,
@@ -56,7 +61,10 @@ export const ContractProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return savedKey || null;
   });
   const [useAI, setUseAI] = useState<boolean>(() => {
-    return localStorage.getItem('use_ai') === 'true';
+    return localStorage.getItem('use_ai') === 'true' || true; // Default to true
+  });
+  const [useDefaultApiKey, setUseDefaultApiKey] = useState<boolean>(() => {
+    return localStorage.getItem('use_default_api_key') !== 'false'; // Default to true
   });
   const [uploadedContract, setUploadedContract] = useState<string | null>(null);
   const [analyzedTerms, setAnalyzedTerms] = useState<Array<{ term: string; explanation: string }> | null>(null);
@@ -88,6 +96,16 @@ export const ContractProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     localStorage.setItem('use_ai', String(newValue));
   };
 
+  const toggleUseDefaultApiKey = () => {
+    const newValue = !useDefaultApiKey;
+    setUseDefaultApiKey(newValue);
+    localStorage.setItem('use_default_api_key', String(newValue));
+  };
+
+  // Compute the effective API key based on user preference
+  const effectiveApiKey = useDefaultApiKey ? DEFAULT_API_KEY : apiKey;
+  const hasApiKey = Boolean(effectiveApiKey);
+
   return (
     <ContractContext.Provider value={{
       contractDetails,
@@ -98,9 +116,9 @@ export const ContractProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setGeneratedContract,
       currentStep,
       setCurrentStep,
-      apiKey,
+      apiKey: effectiveApiKey,
       updateApiKey,
-      hasApiKey: Boolean(apiKey),
+      hasApiKey,
       useAI,
       toggleUseAI,
       uploadedContract,
@@ -108,7 +126,9 @@ export const ContractProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       analyzedTerms,
       setAnalyzedTerms,
       isAnalyzing,
-      setIsAnalyzing
+      setIsAnalyzing,
+      useDefaultApiKey,
+      toggleUseDefaultApiKey
     }}>
       {children}
     </ContractContext.Provider>
