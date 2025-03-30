@@ -1,97 +1,28 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useContract } from '@/context/ContractContext';
-import { CONTRACT_FIELDS, generateContract, CONTRACT_TYPES } from '@/utils/contracts';
 import { ArrowLeft } from 'lucide-react';
-import { toast } from 'sonner';
-import OpenAIService from '@/utils/openai';
 import ContractFormPrompt from './ContractFormPrompt';
 import ContractFormFields from './ContractFormFields';
 import ContractSubmitButton from './ContractSubmitButton';
+import { useContractFormHandler } from './ContractFormHandler';
 
 const ContractFormStep = () => {
-  const { 
-    contractDetails, 
-    updateContractDetails, 
-    setGeneratedContract,
-    setCurrentStep,
-    apiKey,
-    useAI,
-    toggleUseAI,
-    useDefaultApiKey
-  } = useContract();
+  const { useAI, toggleUseAI, contractDetails } = useContract();
   
-  const [formData, setFormData] = useState<{ [key: string]: any }>({});
-  const [contractFields, setContractFields] = useState<any>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const {
+    formData,
+    contractFields,
+    isSubmitting,
+    initForm,
+    handleChange,
+    handleSubmit,
+    handleBack
+  } = useContractFormHandler();
   
   useEffect(() => {
-    if (contractDetails.type && CONTRACT_FIELDS[contractDetails.type]) {
-      setContractFields(CONTRACT_FIELDS[contractDetails.type]);
-      setFormData({...contractDetails});
-    }
+    initForm();
   }, [contractDetails]);
-  
-  const handleChange = (field: string, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-  
-  const handleSubmit = async () => {
-    setIsSubmitting(true);
-    
-    const requiredFields = Object.entries(contractFields.fields)
-      .filter(([_, field]: [string, any]) => field.required)
-      .map(([key]) => key);
-      
-    const missingFields = requiredFields.filter(field => !formData[field]);
-    
-    if (missingFields.length > 0) {
-      toast.error(`Please fill in all required fields: ${missingFields.map(field => contractFields.fields[field].label).join(', ')}`);
-      setIsSubmitting(false);
-      return;
-    }
-    
-    try {
-      updateContractDetails(formData);
-      
-      let contract;
-      
-      // Use AI if enabled and API key is available (either default or user's)
-      if (useAI && apiKey) {
-        try {
-          const openai = new OpenAIService({ apiKey });
-          const contractTypeName = CONTRACT_TYPES.find(t => t.id === contractDetails.type)?.name || contractDetails.type;
-          
-          const prompt = Object.entries(formData)
-            .map(([key, value]) => `${contractFields.fields[key]?.label || key}: ${value}`)
-            .join(', ');
-          
-          const aiGeneratedContract = await openai.generateContract(prompt, contractTypeName as string);
-          contract = aiGeneratedContract;
-        } catch (error: any) {
-          console.error("AI Generation Error:", error);
-          toast.error(`AI generation failed: ${error.message}. Using template instead.`);
-          contract = generateContract(contractDetails.type as string, formData);
-        }
-      } else {
-        contract = generateContract(contractDetails.type as string, formData);
-      }
-      
-      setGeneratedContract(contract);
-      setCurrentStep(2);
-    } catch (error) {
-      toast.error('Error generating contract. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-  
-  const handleBack = () => {
-    setCurrentStep(0);
-  };
   
   if (!contractFields) {
     return <div>Loading...</div>;
