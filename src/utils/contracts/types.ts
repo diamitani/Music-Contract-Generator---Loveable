@@ -6,7 +6,11 @@ export type ContractType =
   | 'songwriter' 
   | 'performance' 
   | 'licensing' 
-  | 'distribution';
+  | 'distribution'
+  | 'collaboration'
+  | 'session-musician'
+  | 'sync-licensing'
+  | 'nft-music';
 
 export interface ContractRequiredFields {
   type: string;

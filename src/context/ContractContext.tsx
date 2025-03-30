@@ -1,14 +1,5 @@
-
 import React, { createContext, useContext, useState } from 'react';
-
-type ContractType = 
-  | 'artist-manager' 
-  | 'record-label' 
-  | 'producer' 
-  | 'songwriter' 
-  | 'performance' 
-  | 'licensing' 
-  | 'distribution';
+import { ContractType } from '@/utils/contracts/types';
 
 interface ContractDetails {
   type: ContractType | null;

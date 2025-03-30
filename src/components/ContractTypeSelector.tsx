@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useContract } from '@/context/ContractContext';
 import { CONTRACT_TYPES } from '@/utils/contracts';
+import { ContractType } from '@/utils/contracts/types';
 import { UserRoundCog, Disc, PenTool, Mic2, FileSpreadsheet, Share2, Music, Globe, Zap, Award } from 'lucide-react';
 import ContractTypeFAQ from './contract/ContractTypeFAQ';
 
@@ -9,25 +10,25 @@ import ContractTypeFAQ from './contract/ContractTypeFAQ';
 const ENHANCED_CONTRACT_TYPES = [
   ...CONTRACT_TYPES,
   {
-    id: 'collaboration',
+    id: 'collaboration' as ContractType,
     name: 'Collaboration Agreement',
     description: 'Contract between artists working together on a project, detailing contributions and revenue sharing.',
     icon: 'Zap',
   },
   {
-    id: 'session-musician',
+    id: 'session-musician' as ContractType,
     name: 'Session Musician Agreement',
     description: 'Contract for hiring session musicians, covering payment, rights, and usage terms.',
     icon: 'Music',
   },
   {
-    id: 'sync-licensing',
+    id: 'sync-licensing' as ContractType,
     name: 'Sync Licensing Agreement',
     description: 'Contract for synchronization licensing of music in film, TV, advertisements, or other media.',
     icon: 'Globe',
   },
   {
-    id: 'nft-music',
+    id: 'nft-music' as ContractType,
     name: 'NFT Music Release Agreement',
     description: 'Modern contract for releasing music as NFTs, covering royalties and digital ownership rights.',
     icon: 'Award',
@@ -40,7 +41,7 @@ const ContractTypeSelector = () => {
   const [selectedForFAQ, setSelectedForFAQ] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const handleSelectType = (typeId: any) => {
+  const handleSelectType = (typeId: ContractType) => {
     setContractType(typeId);
     setCurrentStep(1);
   };
