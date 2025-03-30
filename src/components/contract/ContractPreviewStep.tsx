@@ -1,14 +1,29 @@
 
 import { useState } from 'react';
 import { useContract } from '@/context/ContractContext';
-import { ArrowLeft, Download, Pen, FileType } from 'lucide-react';
+import { ArrowLeft, Download, Pen, FileType, Book, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { exportToPDF } from '@/utils/pdfExport';
+import { Button } from '@/components/ui/button';
 
 const ContractPreviewStep = () => {
-  const { setCurrentStep, generatedContract } = useContract();
-  const [contractText, setContractText] = useState(generatedContract || '');
+  const { 
+    setCurrentStep, 
+    generatedContract, 
+    uploadedContract, 
+    setGeneratedContract,
+    setAnalyzedTerms
+  } = useContract();
+  
+  const [contractText, setContractText] = useState(uploadedContract || generatedContract || '');
+
+  const handleAnalyzeContract = () => {
+    // Reset previously analyzed terms
+    setAnalyzedTerms(null);
+    // Go to analyzer step
+    setCurrentStep(3);
+  };
 
   const handleDownload = (format: 'txt' | 'docx' | 'pdf') => {
     // For txt format, use blob
@@ -67,6 +82,15 @@ const ContractPreviewStep = () => {
     }
   };
 
+  const handleSaveChanges = () => {
+    if (uploadedContract) {
+      setGeneratedContract(contractText);
+    } else {
+      setGeneratedContract(contractText);
+    }
+    toast.success("Contract changes saved");
+  };
+
   return (
     <div className="w-full max-w-4xl mx-auto">
       <button
@@ -80,27 +104,32 @@ const ContractPreviewStep = () => {
         <div>
           <h2 className="text-2xl md:text-3xl font-bold mb-1">Your Contract</h2>
           <p className="text-gray-600 dark:text-gray-300">
-            Review your generated contract and make any necessary edits
+            Review your {uploadedContract ? 'uploaded' : 'generated'} contract and make any necessary edits
           </p>
         </div>
         
-        <div className="flex gap-3 mt-4 md:mt-0">
-          <button 
-            className="button-transition flex items-center gap-2 border border-gray-300 dark:border-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-900"
-            onClick={() => {
-              toast.info('Editing mode enabled. Make your changes in the text below.');
-            }}
+        <div className="flex flex-wrap gap-3 mt-4 md:mt-0">
+          <Button
+            variant="outline"
+            className="flex items-center gap-2"
+            onClick={handleAnalyzeContract}
           >
-            <Pen className="w-4 h-4" /> Edit
-          </button>
+            <Book className="w-4 h-4" /> Analyze Terms
+          </Button>
+          
+          <Button
+            variant="outline"
+            className="flex items-center gap-2"
+            onClick={handleSaveChanges}
+          >
+            <Pen className="w-4 h-4" /> Save Changes
+          </Button>
           
           <Popover>
             <PopoverTrigger asChild>
-              <button 
-                className="button-transition flex items-center gap-2 bg-black text-white dark:bg-white dark:text-black px-4 py-2 rounded-full text-sm font-medium hover:bg-opacity-80 dark:hover:bg-opacity-80"
-              >
+              <Button className="flex items-center gap-2">
                 <Download className="w-4 h-4" /> Download
-              </button>
+              </Button>
             </PopoverTrigger>
             <PopoverContent className="w-48">
               <div className="flex flex-col space-y-1">
@@ -132,9 +161,11 @@ const ContractPreviewStep = () => {
       </div>
       
       <div className="glass-panel p-6 overflow-auto animate-slide-in-up animation-delay-100">
-        <div className="max-h-[70vh] overflow-y-auto pr-4 font-mono text-sm whitespace-pre-wrap">
-          {contractText}
-        </div>
+        <textarea
+          className="w-full h-[70vh] resize-none bg-transparent border-none focus:outline-none font-mono text-sm whitespace-pre-wrap"
+          value={contractText}
+          onChange={(e) => setContractText(e.target.value)}
+        />
       </div>
     </div>
   );

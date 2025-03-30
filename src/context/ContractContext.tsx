@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState } from 'react';
 import { ContractType } from '@/utils/contracts/types';
 
@@ -26,6 +27,12 @@ interface ContractContextType {
   hasApiKey: boolean;
   useAI: boolean;
   toggleUseAI: () => void;
+  uploadedContract: string | null;
+  setUploadedContract: (contract: string | null) => void;
+  analyzedTerms: Array<{ term: string; explanation: string }> | null;
+  setAnalyzedTerms: (terms: Array<{ term: string; explanation: string }> | null) => void;
+  isAnalyzing: boolean;
+  setIsAnalyzing: (analyzing: boolean) => void;
 }
 
 const defaultContractDetails: ContractDetails = {
@@ -51,6 +58,9 @@ export const ContractProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [useAI, setUseAI] = useState<boolean>(() => {
     return localStorage.getItem('use_ai') === 'true';
   });
+  const [uploadedContract, setUploadedContract] = useState<string | null>(null);
+  const [analyzedTerms, setAnalyzedTerms] = useState<Array<{ term: string; explanation: string }> | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
 
   const updateContractDetails = (details: Partial<ContractDetails>) => {
     setContractDetails(prev => ({ ...prev, ...details }));
@@ -59,6 +69,8 @@ export const ContractProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const resetContractDetails = () => {
     setContractDetails(defaultContractDetails);
     setGeneratedContract(null);
+    setUploadedContract(null);
+    setAnalyzedTerms(null);
   };
 
   const setContractType = (type: ContractType) => {
@@ -90,7 +102,13 @@ export const ContractProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       updateApiKey,
       hasApiKey: Boolean(apiKey),
       useAI,
-      toggleUseAI
+      toggleUseAI,
+      uploadedContract,
+      setUploadedContract,
+      analyzedTerms,
+      setAnalyzedTerms,
+      isAnalyzing,
+      setIsAnalyzing
     }}>
       {children}
     </ContractContext.Provider>

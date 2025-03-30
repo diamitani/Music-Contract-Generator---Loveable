@@ -31,3 +31,8 @@ export interface ContractTypeDefinition {
   description: string;
   icon: string;
 }
+
+export interface AnalyzedTerm {
+  term: string;
+  explanation: string;
+}
