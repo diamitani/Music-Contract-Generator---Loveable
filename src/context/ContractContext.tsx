@@ -48,6 +48,7 @@ const defaultContractDetails: ContractDetails = {
 const ContractContext = createContext<ContractContextType | undefined>(undefined);
 
 export const ContractProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  console.log('ContractProvider rendering');
   const [contractDetails, setContractDetails] = useState<ContractDetails>(defaultContractDetails);
   const [generatedContract, setGeneratedContract] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
@@ -97,8 +98,11 @@ export const ContractProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 };
 
 export const useContract = (): ContractContextType => {
+  console.log('useContract called');
   const context = useContext(ContractContext);
+  console.log('context value:', context);
   if (context === undefined) {
+    console.error('useContract called outside of ContractProvider!');
     throw new Error('useContract must be used within a ContractProvider');
   }
   return context;

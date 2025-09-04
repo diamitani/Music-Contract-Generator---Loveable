@@ -8,7 +8,9 @@ import ContractUploader from './contract/ContractUploader';
 import ContractAnalyzer from './contract/ContractAnalyzer';
 
 const ContractForm = () => {
+  console.log('ContractForm rendering');
   const { currentStep } = useContract();
+  console.log('ContractForm - currentStep:', currentStep);
   
   // AI Input Step
   if (currentStep === 0) {
