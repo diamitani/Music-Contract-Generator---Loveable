@@ -64,8 +64,8 @@ export async function analyzeContract(contract: string, apiKey: string): Promise
         "OpenAI-Beta": "assistants=v1"
       },
       body: JSON.stringify({
-        assistant_id: "asst_", // Default assistant ID
-        model: "gpt-4o",
+        assistant_id: "asst_2pLwzgKk6weEjPN1u3qMEaDq", // Default assistant ID
+        model: "gpt-5-2025-08-07",
         instructions: `You are an expert in music industry contracts. Your job is to analyze contracts and break down complex legal terms into simple explanations that musicians and artists can understand. Focus on identifying potentially problematic clauses, rights assignments, payment terms, and exclusivity requirements. Format your response as a structured JSON-parseable list of terms and explanations.`
       })
     });

@@ -14,8 +14,8 @@ class OpenAIService {
 
   constructor(config: OpenAIAssistantConfig) {
     this.apiKey = config.apiKey;
-    this.assistantId = config.assistantId || "asst_"; // Default assistant ID
-    this.model = config.model || "gpt-4o";
+    this.assistantId = config.assistantId || "asst_2pLwzgKk6weEjPN1u3qMEaDq"; // Default assistant ID
+    this.model = config.model || "gpt-5-2025-08-07";
   }
 
   async generateContract(prompt: string, contractType: string): Promise<string> {

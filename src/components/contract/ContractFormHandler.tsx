@@ -16,8 +16,7 @@ export const useContractFormHandler = () => {
     updateContractDetails, 
     setGeneratedContract,
     setCurrentStep,
-    apiKey,
-    useAI,
+    apiKey
   } = useContract();
   
   const [formData, setFormData] = useState<{ [key: string]: any }>({});
@@ -56,30 +55,28 @@ export const useContractFormHandler = () => {
     try {
       updateContractDetails(formData);
       
-      let contract;
-      
-      // Use AI if enabled and API key is available
-      if (useAI && apiKey) {
-        try {
-          const openai = new OpenAIService({ apiKey });
-          const contractTypeName = CONTRACT_TYPES.find(t => t.id === contractDetails.type)?.name || contractDetails.type;
-          
-          const prompt = Object.entries(formData)
-            .map(([key, value]) => `${contractFields.fields[key]?.label || key}: ${value}`)
-            .join(', ');
-          
-          const aiGeneratedContract = await openai.generateContract(prompt, contractTypeName as string);
-          contract = aiGeneratedContract;
-        } catch (error: any) {
-          console.error("AI Generation Error:", error);
-          toast.error(`AI generation failed: ${error.message}. Using template instead.`);
-          contract = generateContract(contractDetails.type as string, formData);
-        }
-      } else {
-        contract = generateContract(contractDetails.type as string, formData);
+      // Always use AI generation
+      try {
+        const openai = new OpenAIService({ 
+          apiKey,
+          assistantId: "asst_2pLwzgKk6weEjPN1u3qMEaDq",
+          model: "gpt-5-2025-08-07"
+        });
+        const contractTypeName = CONTRACT_TYPES.find(t => t.id === contractDetails.type)?.name || contractDetails.type;
+        
+        const prompt = Object.entries(formData)
+          .map(([key, value]) => `${contractFields.fields[key]?.label || key}: ${value}`)
+          .join(', ');
+        
+        const contract = await openai.generateContract(prompt, contractTypeName as string);
+        setGeneratedContract(contract);
+      } catch (error: any) {
+        console.error("AI Generation Error:", error);
+        toast.error(`AI generation failed: ${error.message}. Using template instead.`);
+        const contract = generateContract(contractDetails.type as string, formData);
+        setGeneratedContract(contract);
       }
       
-      setGeneratedContract(contract);
       setCurrentStep(2);
     } catch (error) {
       toast.error('Error generating contract. Please try again.');

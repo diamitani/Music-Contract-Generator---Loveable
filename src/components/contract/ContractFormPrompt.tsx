@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { CONTRACT_FIELDS } from '@/utils/contracts';
-import ContractAIOptions from './ContractAIOptions';
 
 type MissingField = {
   key: string;
@@ -11,11 +10,9 @@ type MissingField = {
 type ContractFormPromptProps = {
   contractType: string | null;
   formData: Record<string, any>;
-  useAI: boolean;
-  toggleUseAI: () => void;
 };
 
-const ContractFormPrompt = ({ contractType, formData, useAI, toggleUseAI }: ContractFormPromptProps) => {
+const ContractFormPrompt = ({ contractType, formData }: ContractFormPromptProps) => {
   if (!contractType) return null;
   
   const getMissingFields = () => {
@@ -36,7 +33,11 @@ const ContractFormPrompt = ({ contractType, formData, useAI, toggleUseAI }: Cont
         Great! You're drafting a <span className="font-bold">{contractTypeName}</span>
       </h3>
       
-      <ContractAIOptions useAI={useAI} toggleUseAI={toggleUseAI} />
+      <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-4">
+        <p className="text-sm text-blue-800 dark:text-blue-200">
+          ✨ AI-powered generation enabled. Your contract will be professionally crafted based on your inputs.
+        </p>
+      </div>
       
       {missingFields.length > 0 && (
         <div className="mb-4">

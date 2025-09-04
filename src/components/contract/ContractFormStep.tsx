@@ -8,7 +8,7 @@ import ContractSubmitButton from './ContractSubmitButton';
 import { useContractFormHandler } from './ContractFormHandler';
 
 const ContractFormStep = () => {
-  const { useAI, toggleUseAI, contractDetails } = useContract();
+  const { contractDetails } = useContract();
   
   const {
     formData,
@@ -47,8 +47,6 @@ const ContractFormStep = () => {
       <ContractFormPrompt
         contractType={contractDetails.type}
         formData={formData}
-        useAI={useAI}
-        toggleUseAI={toggleUseAI}
       />
       
       <div className="glass-panel p-6 animate-slide-in-up animation-delay-200">

@@ -16,7 +16,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 const ContractAnalyzer = () => {
   const { 
     apiKey, 
-    hasApiKey, 
     uploadedContract, 
     analyzedTerms,
     setAnalyzedTerms,
@@ -29,12 +28,6 @@ const ContractAnalyzer = () => {
   const contractText = uploadedContract || generatedContract || '';
 
   const handleAnalyzeContract = async () => {
-    if (!hasApiKey) {
-      toast.error("An OpenAI API key is required to analyze contracts");
-      setCurrentStep(0); // Go to API key input
-      return;
-    }
-
     if (!contractText) {
       toast.error("No contract found to analyze");
       return;
@@ -43,8 +36,6 @@ const ContractAnalyzer = () => {
     setIsAnalyzing(true);
     
     try {
-      if (!apiKey) throw new Error("API key is required");
-      
       const terms = await analyzeContract(contractText, apiKey);
       setAnalyzedTerms(terms);
       toast.success("Contract analysis complete");

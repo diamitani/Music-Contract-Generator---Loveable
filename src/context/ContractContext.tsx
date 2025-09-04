@@ -22,23 +22,18 @@ interface ContractContextType {
   setGeneratedContract: (contract: string | null) => void;
   currentStep: number;
   setCurrentStep: (step: number) => void;
-  apiKey: string | null;
-  updateApiKey: (key: string) => void;
-  hasApiKey: boolean;
-  useAI: boolean;
-  toggleUseAI: () => void;
+  apiKey: string;
   uploadedContract: string | null;
   setUploadedContract: (contract: string | null) => void;
   analyzedTerms: Array<{ term: string; explanation: string }> | null;
   setAnalyzedTerms: (terms: Array<{ term: string; explanation: string }> | null) => void;
   isAnalyzing: boolean;
   setIsAnalyzing: (analyzing: boolean) => void;
-  useDefaultApiKey: boolean;
-  toggleUseDefaultApiKey: () => void;
 }
 
-// Default API key provided by the site owner
-const DEFAULT_API_KEY = "sk-svcacct-zL_TFd0L60HxVz6aGemkIf9b53Tgjaiyy6msVd3N-Ia_xBmEc9guLxdcYCMT3BlbkFJoG4SeRAEhx0SfhCATepQFh40CxmeqpXdHtljnWHQfNvWGhYQoIYUP11vM5wA";
+// Default API key and assistant ID provided by the site owner
+const DEFAULT_API_KEY = "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";
+export const DEFAULT_ASSISTANT_ID = "asst_2pLwzgKk6weEjPN1u3qMEaDq";
 
 const defaultContractDetails: ContractDetails = {
   type: null,
@@ -56,16 +51,6 @@ export const ContractProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [contractDetails, setContractDetails] = useState<ContractDetails>(defaultContractDetails);
   const [generatedContract, setGeneratedContract] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
-  const [apiKey, setApiKey] = useState<string | null>(() => {
-    const savedKey = localStorage.getItem('openai_api_key');
-    return savedKey || null;
-  });
-  const [useAI, setUseAI] = useState<boolean>(() => {
-    return localStorage.getItem('use_ai') === 'true' || true; // Default to true
-  });
-  const [useDefaultApiKey, setUseDefaultApiKey] = useState<boolean>(() => {
-    return localStorage.getItem('use_default_api_key') !== 'false'; // Default to true
-  });
   const [uploadedContract, setUploadedContract] = useState<string | null>(null);
   const [analyzedTerms, setAnalyzedTerms] = useState<Array<{ term: string; explanation: string }> | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
@@ -85,26 +70,8 @@ export const ContractProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setContractDetails(prev => ({ ...prev, type }));
   };
 
-  const updateApiKey = (key: string) => {
-    setApiKey(key);
-    localStorage.setItem('openai_api_key', key);
-  };
-
-  const toggleUseAI = () => {
-    const newValue = !useAI;
-    setUseAI(newValue);
-    localStorage.setItem('use_ai', String(newValue));
-  };
-
-  const toggleUseDefaultApiKey = () => {
-    const newValue = !useDefaultApiKey;
-    setUseDefaultApiKey(newValue);
-    localStorage.setItem('use_default_api_key', String(newValue));
-  };
-
-  // Compute the effective API key based on user preference
-  const effectiveApiKey = useDefaultApiKey ? DEFAULT_API_KEY : apiKey;
-  const hasApiKey = Boolean(effectiveApiKey);
+  // Always use the default API key
+  const apiKey = DEFAULT_API_KEY;
 
   return (
     <ContractContext.Provider value={{
@@ -116,19 +83,13 @@ export const ContractProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setGeneratedContract,
       currentStep,
       setCurrentStep,
-      apiKey: effectiveApiKey,
-      updateApiKey,
-      hasApiKey,
-      useAI,
-      toggleUseAI,
+      apiKey,
       uploadedContract,
       setUploadedContract,
       analyzedTerms,
       setAnalyzedTerms,
       isAnalyzing,
-      setIsAnalyzing,
-      useDefaultApiKey,
-      toggleUseDefaultApiKey
+      setIsAnalyzing
     }}>
       {children}
     </ContractContext.Provider>
