@@ -73,7 +73,7 @@ export const useContractFormHandler = () => {
       } catch (error: any) {
         console.error("AI Generation Error:", error);
         toast.error(`AI generation failed: ${error.message}. Using template instead.`);
-        const contract = generateContract(contractDetails.type as string, formData);
+        const contract = await generateContract(contractDetails.type as string, formData);
         setGeneratedContract(contract);
       }
       
